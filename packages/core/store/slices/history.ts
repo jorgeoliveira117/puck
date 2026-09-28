@@ -22,17 +22,6 @@ export type HistorySlice<D = any> = {
 
 const EMPTY_HISTORY_INDEX = 0;
 
-function debounce(func: Function, timeout = 300) {
-  let timer: NodeJS.Timeout;
-
-  return (...args: any) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func(...args);
-    }, timeout);
-  };
-}
-
 export type PuckHistory = {
   back: VoidFunction;
   forward: VoidFunction;
@@ -59,7 +48,7 @@ export const createHistorySlice = (
   set: (newState: Partial<AppStore>) => void,
   get: () => AppStore
 ): HistorySlice => {
-  const record = debounce((state: AppState) => {
+  const record = (state: AppState) => {
     const { histories, index } = get().history;
 
     const history: History = {
@@ -77,7 +66,7 @@ export const createHistorySlice = (
         index: newHistories.length - 1,
       },
     });
-  }, 250);
+  };
 
   return {
     initialAppState: {} as AppState,

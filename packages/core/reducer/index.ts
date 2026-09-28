@@ -19,6 +19,7 @@ import {
 import { setDataAction } from "./actions/set-data";
 import { setUiAction } from "./actions/set-ui";
 import { makeStatePublic } from "../lib/data/make-state-public";
+import { debounce } from "../lib/debounce";
 
 export * from "./actions";
 
@@ -34,6 +35,8 @@ function storeInterceptor<UserData extends Data = Data>(
   record?: (appState: AppState<UserData>) => void,
   onAction?: OnAction<UserData>
 ) {
+  const debouncedRecord = record ? debounce(record, 250) : undefined;
+
   return (
     state: PrivateAppState<UserData>,
     action: PuckAction
@@ -53,7 +56,7 @@ function storeInterceptor<UserData extends Data = Data>(
         ? action.recordHistory
         : isValidType
     ) {
-      if (record) record(newAppState);
+      if (debouncedRecord) debouncedRecord(newAppState);
     }
 
     onAction?.(action, makeStatePublic(newAppState), makeStatePublic(state));
